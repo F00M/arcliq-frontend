@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ARCLIQ Swap</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>ARCLIQ Exchange</h1>
+        <p>ARLIQ ↔ USDC on ARC Testnet</p>
+        <button id="connectButton">Connect Wallet</button>
+
+        <div class="box">
+            <h3>Balances</h3>
+            <p>ARLIQ: <span id="arliqBalance">0</span></p>
+            <p>USDC: <span id="usdcBalance">0</span></p>
+        </div>
+
+        <div class="box">
+            <h3>Swap ARLIQ → USDC</h3>
+            <input id="swapAtoB" placeholder="Amount ARLIQ">
+            <button onclick="swapARLIQtoUSDC()">Swap</button>
+        </div>
+
+        <div class="box">
+            <h3>Swap USDC → ARLIQ</h3>
+            <input id="swapBtoA" placeholder="Amount USDC">
+            <button onclick="swapUSDCtoARLIQ()">Swap</button>
+        </div>
+
+        <div class="box">
+            <h3>Add Liquidity</h3>
+            <input id="liqARLIQ" placeholder="Amount ARLIQ">
+            <input id="liqUSDC" placeholder="Amount USDC">
+            <button onclick="addLiquidity()">Add Liquidity</button>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+    <script src="app.js"></script>
+
+</body>
+</html>
