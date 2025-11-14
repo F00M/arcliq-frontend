@@ -1,175 +1,182 @@
-/* ===========================
-   GLOBAL STYLES
-=========================== */
-body {
-    margin: 0;
-    padding: 0;
-    font-family: 'Inter', sans-serif;
-    background: #0b111b;
-    color: #fff;
+/* =========================
+   ARCLIQ — styles/main.css
+   FINAL (responsive + fixes)
+   ========================= */
+
+/* Root / theme */
+:root{
+  --bg-0:#071018;
+  --panel:#0D1621;
+  --card:#121824;
+  --muted:rgba(255,255,255,0.6);
+  --accent:#00C8FF;
+  --accent-2:#0090FF;
+  --text:#E9F3FF;
+  --glass:rgba(255,255,255,0.03);
+  --thin-border:rgba(255,255,255,0.04);
+  --radius:16px;
 }
 
-/* ===========================
-   NAVBAR
-=========================== */
-.navbar {
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px 22px !important;
-    background: #0f1624;
-    position: fixed;
-    top: 0;
-    z-index: 999;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.4);
+/* Reset */
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  background: linear-gradient(180deg,#07101a 0%, #050917 100%);
+  color:var(--text);
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  line-height:1.4;
 }
 
-.nav-left {
-    display: flex;
-    align-items: center;
-    gap: 22px;
+/* NAVBAR */
+.navbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:12px 20px !important;
+  background: rgba(0,0,0,0.35);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--thin-border);
+  position: sticky;
+  top:0;
+  z-index: 50;
+}
+.nav-left{display:flex;align-items:center;gap:18px}
+.logo{
+  font-weight:800;
+  font-size:22px;
+  color:var(--accent);
+  letter-spacing:0.6px;
+}
+.nav-links{display:flex;align-items:center}
+.nav-links a{
+  margin-left:20px;
+  color: rgba(255,255,255,0.78);
+  text-decoration:none;
+  font-weight:600;
+  font-size:15px;
+  padding:6px 8px;
+  border-radius:8px;
+}
+.nav-links a.active{ color:var(--accent) }
+.nav-right{display:flex;align-items:center;gap:12px}
+.connect-btn{
+  padding:8px 12px;
+  border-radius:10px;
+  cursor:pointer;
+  background: linear-gradient(90deg,var(--accent),var(--accent-2));
+  color:#00131b;
+  font-weight:700;
+  border:none;
 }
 
-.nav-left a.logo {
-    font-size: 26px;
-    font-weight: 700;
-    color: #1fb8ff;
-    text-decoration: none;
+/* MAIN LAYOUT */
+.main-wrap{display:flex;justify-content:center;padding:20px 12px; margin-top:6px}
+.panel{width:100%;max-width:960px;display:flex;justify-content:center}
+.col{width:100%;max-width:480px}
+
+/* Panel header */
+.panel-header h2{font-size:24px;margin-bottom:6px}
+.panel-header .small{font-size:13px;color:var(--muted);margin-bottom:12px}
+
+/* Card */
+.card{
+  background: var(--card);
+  padding:18px;
+  border-radius:16px;
+  border:1px solid var(--thin-border);
+  box-shadow:0 10px 40px rgba(0,225,255,0.03);
+  margin-top:6px;
 }
 
-.nav-links a {
-    color: #89a5c7;
-    font-size: 18px;
-    text-decoration: none;
-    margin-left: 20px;
+/* field & inputs */
+.field{margin-bottom:14px}
+.field label{font-size:13px;color:rgba(255,255,255,0.75);display:block;margin-bottom:6px}
+.input-row{position:relative;display:flex;align-items:center;gap:10px;margin-top:0}
+.input-row input{
+  width:100%;
+  padding:12px 92px 12px 14px;
+  border-radius:12px;
+  border:none;
+  background: rgba(255,255,255,0.02);
+  color:var(--text);
+  font-size:20px;
+  outline:none;
 }
 
-.nav-links a.active {
-    color: #1fb8ff;
+/* token button inside input */
+.token-btn{
+  position:absolute;
+  right:10px;
+  top:50%;
+  transform:translateY(-50%);
+  padding:8px 14px;
+  background:#0D1A24;
+  color:var(--accent);
+  border:1px solid rgba(255,255,255,0.06);
+  border-radius:10px;
+  font-weight:700;
+  min-width:72px;
+  text-align:center;
+  cursor:pointer;
+  z-index:5;
 }
 
-.connect-btn {
-    background: linear-gradient(90deg, #00c6ff, #0072ff);
-    padding: 10px 22px;
-    border-radius: 10px;
-    border: none;
-    color: #000;
-    font-weight: 600;
-    cursor: pointer;
+/* swap arrow */
+.swap-arrow{text-align:center;font-size:20px;color:var(--accent);margin:12px 0}
+
+/* settings & slippage */
+.settings-row{display:flex;justify-content:space-between;align-items:center;margin-top:8px}
+.small-btn{padding:8px 10px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.04);cursor:pointer;color:var(--muted)}
+
+/* primary button */
+.primary{
+  width:100%;
+  padding:14px;
+  border-radius:12px;
+  border:none;
+  background:linear-gradient(90deg,var(--accent),var(--accent-2));
+  font-weight:700;
+  color:#00131b;
+  cursor:pointer;
+  box-shadow:0 12px 30px rgba(0,225,255,0.12);
+  font-size:16px;
+  margin-top:10px;
 }
 
-/* ===========================
-   PAGE WRAPPER
-=========================== */
-.page-wrapper {
-    margin-top: 85px !important;
-    padding-bottom: 40px;
+/* info & logs */
+.info-box{margin-top:10px;background:#0b1116;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.03);color:rgba(255,255,255,0.7);font-size:14px}
+.logs{margin-top:16px}
+#logBox{background:#071018;padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);height:140px;overflow:auto;font-family:monospace;font-size:12px;color:#AFFFFF}
+
+/* modal */
+.modal-backdrop{position:fixed;inset:0;background:rgba(2,6,10,0.6);display:flex;align-items:center;justify-content:center;z-index:100}
+.hidden{display:none}
+.modal{background:var(--panel);width:520px;border-radius:12px;padding:14px;border:1px solid rgba(255,255,255,0.04);box-shadow:0 20px 80px rgba(0,0,0,0.6)}
+.modal.small{width:360px}
+.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;font-weight:700}
+.modal-search{width:100%;padding:10px;border-radius:10px;border:none;background:var(--glass);color:inherit;margin-bottom:10px}
+.token-list{max-height:360px;overflow:auto}
+.token-row{display:flex;justify-content:space-between;align-items:center;padding:10px;border-radius:10px;cursor:pointer}
+.token-row:hover{background:rgba(255,255,255,0.02)}
+.token-name{display:flex;align-items:center;gap:10px}
+.token-icon{width:28px;height:28px;border-radius:6px;background:linear-gradient(90deg,var(--accent),var(--accent-2))}
+
+/* slip options */
+.slip-options{display:flex;gap:8px;flex-wrap:wrap}
+.slip-option{padding:8px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.03);cursor:pointer;background:transparent;color:inherit}
+.custom{display:flex;gap:8px;margin-top:8px;align-items:center}
+
+/* responsive */
+@media(max-width:520px){
+  .panel{width:92%}
+  .modal{width:92%}
+  .nav-links a{margin-left:12px;font-size:14px}
+  .token-btn{min-width:64px;padding:8px 10px}
+  .primary{padding:12px}
 }
 
-/* ===========================
-   SWAP BOX
-=========================== */
-.swap-container {
-    width: 92%;
-    max-width: 480px;
-    margin: 12px auto 0;
-    padding: 22px;
-    background: #121b2c;
-    border-radius: 18px;
-    border: 1px solid #202c3d;
-    box-shadow: 0 0 30px rgba(0,0,0,0.35);
-}
-
-/* Title */
-.swap-container h2 {
-    margin: 0 0 5px;
-    font-size: 26px;
-}
-
-.subtitle {
-    color: #9ab1c9;
-    font-size: 15px;
-    margin-bottom: 20px;
-}
-
-/* ===========================
-   INPUT BOXES
-=========================== */
-.input-box {
-    background: #0d141f;
-    border: 1px solid #1f2a3b;
-    padding: 14px;
-    border-radius: 14px;
-    margin-bottom: 18px;
-    position: relative;
-}
-
-.input-box input {
-    width: 100%;
-    background: transparent;
-    border: none;
-    outline: none;
-    color: #fff;
-    font-size: 26px;
-    font-weight: 600;
-}
-
-.balance {
-    color: #839cb9;
-    font-size: 14px;
-    margin-top: 4px;
-}
-
-/* ===========================
-   TOKEN SELECT BTN
-=========================== */
-.token-select {
-    position: absolute;
-    right: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: #102033;
-    border: 1px solid #204060;
-    padding: 8px 15px;
-    color: #39c2ff;
-    border-radius: 12px;
-    font-weight: 600;
-    cursor: pointer;
-}
-
-/* ===========================
-   SWAP BUTTON
-=========================== */
-.swap-btn {
-    width: 100%;
-    padding: 16px;
-    border-radius: 14px;
-    background: linear-gradient(90deg, #00c6ff, #0072ff);
-    color: #000;
-    font-size: 20px;
-    font-weight: 700;
-    border: none;
-    cursor: pointer;
-    margin-top: 18px;
-}
-
-/* ===========================
-   SLIPPAGE / PRICE IMPACT
-=========================== */
-.row-info {
-    display: flex;
-    justify-content: space-between;
-    color: #8698b1;
-    font-size: 14px;
-    margin: 10px 0;
-}
-
-/* ===========================
-   MIN RECEIVED
-=========================== */
-.min-received {
-    margin-top: 10px;
-    font-size: 14px;
-    color: #839cb9;
-}
+/* fix: ensure swap container visible */
+.swap-wrap{width:100%;display:block}
+.swap-card{margin-top:6px}
