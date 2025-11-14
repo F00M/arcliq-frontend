@@ -16,34 +16,42 @@
       <a href="pool.html" class="active">Pool</a>
     </nav>
   </div>
+
   <div class="nav-right">
-    <div class="network">ARC Testnet</div>
     <button id="connectButton" class="btn connect">Connect Wallet</button>
   </div>
 </header>
 
 <main class="main-wrap">
   <section class="panel">
+
     <div class="panel-header">
-      <h2>Pool — Add Liquidity</h2>
-      <div class="small">Provide ARLIQ & USDC to create a pool</div>
+      <h2>Add Liquidity</h2>
+      <div class="small">Provide ARLIQ & USDC</div>
     </div>
 
     <div class="card">
+
       <div class="field">
         <label>ARLIQ Amount</label>
-        <input id="liqARLIQ" class="amount-input" placeholder="0.0" inputmode="decimal" />
+        <div class="input-row">
+          <input id="liqARLIQ" class="amount-input" placeholder="0.0">
+        </div>
       </div>
+
       <div class="field">
         <label>USDC Amount</label>
-        <input id="liqUSDC" class="amount-input" placeholder="0.0" inputmode="decimal" />
+        <div class="input-row">
+          <input id="liqUSDC" class="amount-input" placeholder="0.0">
+        </div>
       </div>
 
       <button id="addBtn" class="btn primary">Add Liquidity</button>
-      <div class="info-box" id="poolInfo">Tip: start with small amounts for testing.</div>
+
+      <div id="poolInfo" class="info-box">Tip: test with small amounts.</div>
     </div>
 
-    <div id="logBox" class="logs"></div>
+    <div class="logs" id="logBox"></div>
   </section>
 </main>
 
