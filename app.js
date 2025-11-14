@@ -1,206 +1,169 @@
-// app.js - ARCLIQ PRO (final)
-// Addresses (change if needed)
-const ARLIQ = "0x3Be143cf70ACb16C7208673F1D3D2Ae403ebaEB3";
-const USDC  = "0x3600000000000000000000000000000000000000"; // native USDC (6)
-const DEX   = "0xbA90A1Fa5D6Afa62789100678684F324Afc7F307"; // DEX V3 decimal-aware
+// ===============================================
+// CONFIG
+// ===============================================
+const TOKENS = {
+    ARLIQ: {
+        symbol: "ARLIQ",
+        decimals: 18,
+        address: "0x3Be143cf70ACb16C7208673F1D3D2Ae403ebaEB3"
+    },
+    USDC: {
+        symbol: "USDC",
+        decimals: 6,
+        address: "0x3600000000000000000000000000000000000000"
+    }
+};
 
-// Ethers objects
-let provider, signer;
-let dexContract, arliqContract, usdcContract;
+let provider;
+let signer;
+let userAddress;
+let dex;
 
-// ABIs (minimal)
-const abiERC20 = [
-  "function balanceOf(address) view returns (uint)",
-  "function approve(address spender, uint amount) returns (bool)",
-  "function decimals() view returns (uint8)",
-  "function symbol() view returns (string)"
-];
-const abiDEX = [
-  "function addLiquidity(uint amountA, uint amountB)",
-  "function swapARLIQtoUSDC(uint amountIn)",
-  "function swapUSDCtoARLIQ(uint amountIn)"
-];
-
-// UI elements
-const connectBtn = document.getElementById("connectButton");
-const logBox = document.getElementById("logBox");
-const swapBtn = document.getElementById("swapBtn");
-const fromTokenBtn = document.getElementById("fromTokenBtn");
-const toTokenBtn = document.getElementById("toTokenBtn");
-const swapInputA = document.getElementById("swapAtoB");
-const swapInputB = document.getElementById("swapBtoA");
-const tokenListEl = document.getElementById("tokenList");
-const modalBackdrop = document.getElementById("modalBackdrop");
-const closeModal = document.getElementById("closeModal");
-const tokenSearch = document.getElementById("tokenSearch");
-const slipBtn = document.getElementById("slippageBtn");
-const slipBackdrop = document.getElementById("slipBackdrop");
-const slipOptions = document.querySelectorAll(".slip-option");
-const slipValEl = document.getElementById("slipVal");
-const priceImpactEl = document.getElementById("piVal");
-const minReceiveEl = document.getElementById("minReceive");
-
-// default token state
-let tokenA = {address: ARLIQ, symbol: "ARLIQ", decimals: 18};
-let tokenB = {address: USDC, symbol: "USDC", decimals: 6};
-let selecting = null; // "from" or "to"
-let slippage = localStorage.getItem("arcliq_slip") || "0.5"; // percent
-
-slipValEl.innerText = slippage + "%";
-
-// token list (extendable)
-const TOKENS = [
-  {address: ARLIQ, symbol: "ARLIQ", decimals: 18},
-  {address: USDC, symbol: "USDC", decimals: 6}
+const DEX_ADDRESS = "0xbA90A1Fa5D6Afa62789100678684F324Afc7F307";
+const DEX_ABI = [
+    "function getAmountOut(uint256 amountIn, address tokenIn, address tokenOut) view returns (uint256)",
+    "function swap(address tokenIn, address tokenOut, uint256 amountIn) returns (uint256)",
+    "function addLiquidity(uint256 amountA, uint256 amountB)"
 ];
 
-// logging
-function log(msg){
-  const t = new Date().toLocaleTimeString();
-  logBox.innerHTML += `[${t}] ${msg}<br>`;
-  logBox.scrollTop = logBox.scrollHeight;
-}
+const ERC20_ABI = [
+    "function balanceOf(address) view returns (uint256)",
+    "function allowance(address owner, address spender) view returns (uint256)",
+    "function approve(address spender, uint256 amount) returns (bool)",
+    "function decimals() view returns (uint8)"
+];
 
-// connect wallet
-connectBtn.onclick = async () => {
-  try {
-    await window.ethereum.request({ method: "eth_requestAccounts" });
+let fromToken = "ARLIQ";
+let toToken = "USDC";
+
+// ===============================================
+// CONNECT WALLET
+// ===============================================
+async function connectWallet() {
+    if (!window.ethereum) return alert("Install MetaMask dhisik, Mas!");
+
     provider = new ethers.providers.Web3Provider(window.ethereum);
+    await provider.send("eth_requestAccounts", []);
     signer = provider.getSigner();
+    userAddress = await signer.getAddress();
 
-    dexContract = new ethers.Contract(DEX, abiDEX, signer);
-    arliqContract = new ethers.Contract(ARLIQ, abiERC20, signer);
-    usdcContract = new ethers.Contract(USDC, abiERC20, signer);
+    document.querySelector(".connect-btn").innerText =
+        userAddress.slice(0, 6) + "..." + userAddress.slice(-4);
 
-    log("Wallet connected");
-    await loadBalances();
-    startAutoRefresh();
-  } catch (e) {
-    log("ERROR connect: " + (e.message || e));
-  }
-};
+    dex = new ethers.Contract(DEX_ADDRESS, DEX_ABI, signer);
 
-// load balances
-async function loadBalances(){
-  try {
-    const addr = await signer.getAddress();
-    const decA = await arliqContract.decimals().catch(()=>18);
-    const decB = await usdcContract.decimals().catch(()=>6);
-
-    const bA = await arliqContract.balanceOf(addr);
-    const bB = await usdcContract.balanceOf(addr);
-
-    document.getElementById("arliqBalance").innerText = ethers.utils.formatUnits(bA, decA);
-    document.getElementById("usdcBalance").innerText = ethers.utils.formatUnits(bB, decB);
-    log("Balances updated");
-  } catch (e){
-    log("ERROR load balance: " + (e.message || e));
-  }
+    loadBalances();
 }
 
-// auto refresh balances every 5s
-let refreshInterval = null;
-function startAutoRefresh(){
-  if(refreshInterval) clearInterval(refreshInterval);
-  refreshInterval = setInterval(async ()=>{
-    try { if(signer) await loadBalances(); } catch(e){}
-  },5000);
+// ===============================================
+// LOAD BALANCE
+// ===============================================
+async function loadBalances() {
+    try {
+        const arliq = new ethers.Contract(TOKENS.ARLIQ.address, ERC20_ABI, provider);
+        const usdc = new ethers.Contract(TOKENS.USDC.address, ERC20_ABI, provider);
+
+        const balA = await arliq.balanceOf(userAddress);
+        const balU = await usdc.balanceOf(userAddress);
+
+        document.getElementById("from-balance").innerText =
+            Number(ethers.utils.formatUnits(balA, 18)).toLocaleString();
+
+        document.getElementById("to-balance").innerText =
+            Number(ethers.utils.formatUnits(balU, 6)).toLocaleString();
+    } catch (e) {
+        console.log("ERR load balance", e);
+    }
 }
 
-// TOKEN SELECTOR
-function openTokenSelector(which){
-  selecting = which;
-  modalBackdrop.classList.remove("hidden");
-  renderTokenList(TOKENS);
-  tokenSearch.value = "";
-  tokenSearch.focus();
-}
-fromTokenBtn.onclick = ()=> openTokenSelector("from");
-toTokenBtn.onclick = ()=> openTokenSelector("to");
-closeModal.onclick = ()=> modalBackdrop.classList.add("hidden");
-tokenSearch.oninput = (e)=>{
-  const q = e.target.value.toLowerCase();
-  const filtered = TOKENS.filter(t => t.symbol.toLowerCase().includes(q) || t.address.toLowerCase().includes(q));
-  renderTokenList(filtered);
-};
-
-function renderTokenList(list){
-  tokenListEl.innerHTML = "";
-  list.forEach(t=>{
-    const row = document.createElement("div");
-    row.className = "token-row";
-    row.innerHTML = `<div class="token-name"><div class="token-icon"></div><div>${t.symbol}</div></div><div style="font-size:13px;color:var(--muted)">${t.address.slice(0,6)}...</div>`;
-    row.onclick = ()=>{
-      if(selecting === "from"){ tokenA = t; fromTokenBtn.innerText = t.symbol + " ▾"; }
-      else { tokenB = t; toTokenBtn.innerText = t.symbol + " ▾"; }
-      modalBackdrop.classList.add("hidden");
-      log(`Selected ${t.symbol} for ${selecting}`);
-      if(signer) loadBalances();
-    };
-    tokenListEl.appendChild(row);
-  });
-}
-
-// SLIPPAGE
-slipBtn.onclick = ()=> slipBackdrop.classList.remove("hidden");
-document.getElementById("closeSlip").onclick = ()=> slipBackdrop.classList.add("hidden");
-slipOptions.forEach(b=>{
-  b.onclick = ()=> {
-    slippage = b.dataset.val;
-    slipValEl.innerText = slippage + "%";
-    localStorage.setItem("arcliq_slip", slippage);
-    slipBackdrop.classList.add("hidden");
-  };
+// ===============================================
+// UPDATE ESTIMATION
+// ===============================================
+document.getElementById("from-amount").addEventListener("input", async () => {
+    await updateToAmount();
 });
-document.getElementById("saveSlip").onclick = ()=>{
-  const v = document.getElementById("slipCustom").value;
-  if(v && !isNaN(v)){ slippage = v; slipValEl.innerText = slippage + "%"; localStorage.setItem("arcliq_slip", slippage); slipBackdrop.classList.add("hidden"); }
-};
 
-// simple estimate (placeholder)
-function computeEstimate(amountStr){
-  if(!amountStr || isNaN(Number(amountStr))) return {minReceive:"—", impact:"0%"};
-  const amount = Number(amountStr);
-  const impact = amount > 1000 ? "0.3%" : "0.01%";
-  const minRecv = (amount * (1 - parseFloat(slippage)/100)).toFixed(6);
-  return {minReceive: minRecv, impact};
+async function updateToAmount() {
+    if (!dex) return;
+    const val = document.getElementById("from-amount").value;
+    if (!val || val <= 0) {
+        document.getElementById("to-amount").value = "";
+        return;
+    }
+
+    try {
+        const raw = ethers.utils.parseUnits(val, TOKENS[fromToken].decimals);
+
+        const out = await dex.getAmountOut(
+            raw,
+            TOKENS[fromToken].address,
+            TOKENS[toToken].address
+        );
+
+        document.getElementById("to-amount").value =
+            ethers.utils.formatUnits(out, TOKENS[toToken].decimals);
+    } catch (e) {
+        console.log("ERR calc:", e);
+    }
 }
 
-// Swap ARLIQ -> USDC (uses DEX V3 function swapARLIQtoUSDC)
-async function swapARLIQtoUSDC(){
-  try {
-    if(!signer) return log("Connect wallet first");
-    const amount = document.getElementById("swapAtoB").value;
-    if(!amount || isNaN(Number(amount))) return log("Invalid amount");
-    const decA = await arliqContract.decimals();
-    const amt = ethers.utils.parseUnits(amount, decA);
+// ===============================================
+// SWAP
+// ===============================================
+async function doSwap() {
+    if (!dex) return alert("Connect wallet disik Mas!");
 
-    const addr = await signer.getAddress();
-    const bal = await arliqContract.balanceOf(addr);
-    if(amt.gt(bal)) return log("ERROR: ARLIQ exceeds balance");
+    const amount = document.getElementById("from-amount").value;
+    if (!amount) return;
 
-    log("Approving ARLIQ...");
-    const apptx = await arliqContract.approve(DEX, amt);
-    await apptx.wait();
+    const raw = ethers.utils.parseUnits(amount, TOKENS[fromToken].decimals);
+    const tokenContract = new ethers.Contract(
+        TOKENS[fromToken].address,
+        ERC20_ABI,
+        signer
+    );
 
-    log("Swapping ARLIQ → USDC...");
-    const tx = await dexContract.swapARLIQtoUSDC(amt);
-    log("Tx sent: " + tx.hash);
+    let allowance = await tokenContract.allowance(userAddress, DEX_ADDRESS);
+
+    if (allowance.lt(raw)) {
+        await tokenContract.approve(DEX_ADDRESS, raw);
+    }
+
+    const tx = await dex.swap(
+        TOKENS[fromToken].address,
+        TOKENS[toToken].address,
+        raw
+    );
+
     await tx.wait();
-    log("Swap SUCCESS!");
-
-    const est = computeEstimate(amount);
-    minReceiveEl.innerText = "Minimum received: " + est.minReceive + " " + tokenB.symbol;
-    priceImpactEl.innerText = est.impact;
-    await loadBalances();
-  } catch (e){
-    log("ERROR swap: " + (e.message || e));
-  }
+    loadBalances();
 }
 
-// wire swap button
-swapBtn.onclick = swapARLIQtoUSDC;
+// ===============================================
+// ADD LIQUIDITY
+// ===============================================
+async function addLiquidity() {
+    if (!dex) return alert("Connect disik Mas!");
 
-// init token list UI
-renderTokenList(TOKENS);
-slipValEl.innerText = slippage + "%";
+    const A = document.getElementById("from-amount").value;
+    const B = document.getElementById("to-amount").value;
+
+    if (!A || !B) return alert("Isi jumlah dhisik!");
+
+    const rawA = ethers.utils.parseUnits(A, 18);
+    const rawB = ethers.utils.parseUnits(B, 6);
+
+    const tokenA = new ethers.Contract(TOKENS.ARLIQ.address, ERC20_ABI, signer);
+    const tokenB = new ethers.Contract(TOKENS.USDC.address, ERC20_ABI, signer);
+
+    if ((await tokenA.allowance(userAddress, DEX_ADDRESS)).lt(rawA))
+        await tokenA.approve(DEX_ADDRESS, rawA);
+
+    if ((await tokenB.allowance(userAddress, DEX_ADDRESS)).lt(rawB))
+        await tokenB.approve(DEX_ADDRESS, rawB);
+
+    const tx = await dex.addLiquidity(rawA, rawB);
+    await tx.wait();
+
+    loadBalances();
+}
