@@ -1,21 +1,29 @@
-/* === GLOBAL === */
-body {
+/* ----- RESET ----- */
+* {
     margin: 0;
     padding: 0;
-    font-family: 'Inter', sans-serif;
-    background: #0b111b;
-    color: #fff;
+    box-sizing: border-box;
+    font-family: "Inter", sans-serif;
 }
 
-/* === NAVBAR === */
-.navbar {
+body {
+    background: #071017;
+    color: white;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+/* ----- NAVBAR ----- */
+nav {
     width: 100%;
-    padding: 18px 28px;
     display: flex;
-    align-items: center;
     justify-content: space-between;
-    background: #0d1624;
-    border-bottom: 1px solid #1a2536;
+    align-items: center;
+    padding: 18px 24px;
+    background: #071520;
+    position: sticky;
+    top: 0;
+    z-index: 50;
 }
 
 .nav-left {
@@ -24,183 +32,196 @@ body {
     gap: 28px;
 }
 
-.nav-title {
-    font-size: 28px;
-    font-weight: 700;
-    color: #18c0ff;
+.nav-left .logo {
+    font-size: 32px;
+    font-weight: 800;
+    color: #19d3ff;
+    letter-spacing: 1px;
 }
 
-.nav-link {
-    font-size: 18px;
-    font-weight: 500;
-    cursor: pointer;
-    color: #9ab6d1;
+.nav-links {
+    display: flex;
+    gap: 22px;
+    font-size: 20px;
 }
 
-.nav-link.active {
-    color: #23c0ff;
+.nav-links a {
+    color: #7cc9ff;
+    text-decoration: none;
+    transition: 0.2s;
 }
 
-.wallet-btn {
-    padding: 10px 18px;
-    font-size: 16px;
-    border-radius: 12px;
-    background: #19bfff;
-    color: #000;
-    border: none;
+.nav-links a.active {
+    color: #19d3ff;
 }
 
-/* === MAIN SWAP BOX === */
-.swap-box {
-    width: 92%;
-    max-width: 420px;
-    margin: 40px auto;
-    padding: 28px;
-    background: #111a28;
-    border-radius: 20px;
-    border: 1px solid #203040;
+.nav-links a:hover {
+    color: #19d3ff;
 }
 
-.swap-title {
-    font-size: 34px;
-    font-weight: 700;
-}
-
-.swap-sub {
-    font-size: 16px;
-    color: #9ab6d1;
-    margin-bottom: 14px;
-}
-
-/* === INPUT WRAPPER === */
-.input-wrap {
-    width: 100%;
-    background: #141f30;
-    border: 1px solid #233445;
+nav button {
+    padding: 10px 22px;
     border-radius: 14px;
-    padding: 16px 14px;
-    margin-bottom: 18px;
+    font-size: 16px;
+    font-weight: 600;
+    background: linear-gradient(90deg, #00c6ff, #0072ff);
+    border: none;
+    color: white;
+    cursor: pointer;
+}
+
+/* ----- MAIN WRAPPER ----- */
+.container {
+    width: 100%;
+    max-width: 430px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+.section-title {
+    font-size: 36px;
+    font-weight: 800;
+}
+
+.sub {
+    margin-top: 8px;
+    opacity: 0.7;
+    font-size: 20px;
+}
+
+/* ----- CARD SWAP ----- */
+.card {
+    background: #0c141d;
+    padding: 28px;
+    border-radius: 22px;
+    margin-top: 22px;
+    border: 1px solid #11202d;
+}
+
+/* ----- TOKEN INPUT BOX ----- */
+.token-box {
+    background: #0f1a26;
+    border-radius: 18px;
+    padding: 18px 18px;
+    margin-top: 12px;
+    border: 1px solid #1c2b3a;
     position: relative;
 }
 
-.input-wrap input {
-    width: 100%;
+.token-box input {
+    width: 60%;
+    font-size: 28px;
     background: transparent;
     border: none;
-    outline: none;
-    color: #fff;
-    font-size: 26px;
-    font-weight: 600;
+    color: white;
 }
 
-.token-btn {
+.token-select {
     position: absolute;
-    right: 14px;
+    right: 18px;
     top: 50%;
     transform: translateY(-50%);
-    padding: 8px 14px;
-    border-radius: 12px;
-    background: #14293d;
-    border: 1px solid #1f364d;
-    color: #18c0ff;
-    font-size: 16px;
 }
 
-/* === ARROWS === */
-.swap-arrow {
-    text-align: center;
-    font-size: 26px;
-    margin: 18px 0;
-    color: #1ec7ff;
-}
-
-/* === INFO ROW === */
-.info-row {
-    display: flex;
-    justify-content: space-between;
-    font-size: 14px;
-    margin-bottom: 10px;
-    color: #8ca2bf;
-}
-
-/* === SWAP BUTTON === */
-.swap-btn {
-    width: 100%;
-    padding: 16px 20px;
-    margin-top: 12px;
-    border-radius: 16px;
-    border: none;
-    background: linear-gradient(90deg, #00c6ff, #0072ff);
-    color: #000;
-    font-size: 20px;
-    font-weight: 700;
+.token-button {
+    padding: 10px 18px;
+    border-radius: 14px;
+    background: #0b2634;
+    border: 1px solid #1b3b50;
+    color: #47bfff;
+    font-size: 17px;
     cursor: pointer;
 }
 
-/* === MIN RECEIVED === */
-.min-received {
+/* ----- SWAP ARROWS ----- */
+.swap-arrow {
+    text-align: center;
+    margin: 18px 0;
+    font-size: 26px;
+    color: #2dccff;
+}
+
+/* ----- SLIPPAGE + PRICE ROW ----- */
+.flex-row {
+    display: flex;
+    justify-content: space-between;
     margin-top: 12px;
-    font-size: 14px;
-    color: #8ca2bf;
+    align-items: center;
 }
 
-/* === LOG PANEL === */
-.log-box {
-    width: 92%;
-    max-width: 420px;
-    margin: 20px auto;
-    padding: 16px;
-    background: #101a26;
+.slippage-box {
+    padding: 8px 12px;
+    background: #12202c;
     border-radius: 12px;
-    border: 1px solid #203040;
-    font-family: monospace;
-    font-size: 13px;
-    color: #62f0ff;
+    font-size: 14px;
+    border: 1px solid #224055;
 }
 
-/* === TOKEN MODAL === */
+/* ----- SWAP BUTTON ----- */
+.swap-btn {
+    width: 100%;
+    padding: 18px;
+    border-radius: 16px;
+    margin-top: 24px;
+    font-size: 22px;
+    font-weight: 700;
+    color: white;
+    border: none;
+    background: linear-gradient(90deg, #00c6ff, #0072ff);
+    cursor: pointer;
+}
+
+/* ----- MIN RECEIVED ----- */
+.min-received {
+    margin-top: 14px;
+    opacity: 0.7;
+    font-size: 16px;
+}
+
+/* ----- TOKEN MODAL ----- */
 .token-modal {
     position: fixed;
-    top: 0; left: 0;
+    left: 0; top: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0,0,0,0.55);
+    background: rgba(0,0,0,0.75);
     display: none;
-    align-items: center;
     justify-content: center;
+    align-items: center;
+    z-index: 80;
 }
 
 .token-modal-content {
     width: 90%;
     max-width: 380px;
-    background: #0f1826;
-    border: 1px solid #223448;
-    border-radius: 18px;
-    padding: 20px;
+    background: #0f1a26;
+    border-radius: 16px;
+    padding: 18px;
+    border: 1px solid #203040;
 }
 
-.token-search {
-    width: 100%;
-    margin-bottom: 18px;
-}
-
-.token-search input {
-    width: 100%;
-    padding: 10px 14px;
-    border-radius: 12px;
-    background: #101b2d;
-    border: 1px solid #223449;
-    color: #fff;
-}
-
-/* --- token item --- */
 .token-item {
-    padding: 12px 10px;
-    background: #14202f;
-    border-radius: 10px;
-    margin-bottom: 10px;
-    border: 1px solid #223445;
-    display: flex;
-    justify-content: space-between;
+    padding: 14px;
+    border-radius: 12px;
+    background: #15202b;
+    border: 1px solid #264052;
+    margin-top: 10px;
     cursor: pointer;
+}
+
+.token-item:hover {
+    background: #1b2b3d;
+}
+
+/* ----- MOBILE RESPONSIVE FIX ----- */
+@media(max-width: 430px) {
+    nav {
+        padding: 16px 18px;
+    }
+    .nav-links {
+        font-size: 18px;
+    }
+    .container {
+        margin-top: 30px !important;
+    }
 }
