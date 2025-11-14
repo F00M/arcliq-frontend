@@ -28,3 +28,18 @@ button {
     margin-top: 20px;
     border-radius: 10px;
 }
+
+/* ⭐ PANEL LOG PREMIUM */
+#logBox {
+    background: #000;
+    color: #0f0;
+    padding: 10px;
+    margin-top: 20px;
+    height: 180px;
+    overflow-y: auto;
+    font-family: monospace;
+    border-radius: 8px;
+    font-size: 13px;
+    text-align: left;
+    border: 1px solid #0f0;
+}
