@@ -15,12 +15,10 @@
     <nav class="nav-links">
       <a href="index.html" class="active">Swap</a>
       <a href="pool.html">Pool</a>
-      <a href="#" id="docsLink">Docs</a>
     </nav>
   </div>
 
   <div class="nav-right">
-    <div id="networkTag" class="network">ARC Testnet</div>
     <button id="connectButton" class="btn connect">Connect Wallet</button>
   </div>
 </header>
@@ -29,7 +27,7 @@
   <section class="panel">
     <div class="panel-header">
       <h2>Swap</h2>
-      <div class="small">ARLIQ ↔ USDC (ARC Testnet)</div>
+      <div class="small">ARLIQ ↔ USDC</div>
     </div>
 
     <div class="card">
@@ -54,16 +52,13 @@
       </div>
 
       <div class="settings-row">
-        <div class="left">
-          <button id="slippageBtn" class="small-btn">Slippage: <span id="slipVal">0.5%</span> ▾</button>
-        </div>
-        <div class="right">
-          <div id="priceImpact" class="tiny">Price impact: <span id="piVal">—</span></div>
-        </div>
+        <button id="slippageBtn" class="small-btn">
+          Slippage: <span id="slipVal">0.5%</span> ▾
+        </button>
+        <div class="tiny">Price impact: <span id="piVal">—</span></div>
       </div>
 
       <button id="swapBtn" class="btn primary">Swap</button>
-
       <div class="info-box" id="minReceive">Minimum received: —</div>
     </div>
 
@@ -71,21 +66,19 @@
   </section>
 </main>
 
-<!-- TOKEN SELECTOR MODAL -->
+<!-- Token Selector Modal -->
 <div id="modalBackdrop" class="modal-backdrop hidden">
   <div class="modal">
     <div class="modal-header">
       <div>Choose a token</div>
       <button id="closeModal" class="small-btn">✕</button>
     </div>
-    <input id="tokenSearch" class="modal-search" placeholder="Search name or address" />
-    <div id="tokenList" class="token-list">
-      <!-- token rows injected by JS -->
-    </div>
+    <input id="tokenSearch" class="modal-search" placeholder="Search token" />
+    <div id="tokenList" class="token-list"></div>
   </div>
 </div>
 
-<!-- SLIPPAGE MODAL -->
+<!-- Slippage Modal -->
 <div id="slipBackdrop" class="modal-backdrop hidden">
   <div class="modal small">
     <div class="modal-header">
@@ -97,7 +90,7 @@
       <button class="slip-option" data-val="0.5">0.5%</button>
       <button class="slip-option" data-val="1">1%</button>
       <div class="custom">
-        <input id="slipCustom" placeholder="custom %" inputmode="decimal" />
+        <input id="slipCustom" placeholder="custom %" />
         <button id="saveSlip" class="small-btn">Save</button>
       </div>
     </div>
