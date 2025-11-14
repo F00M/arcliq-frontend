@@ -1,4 +1,4 @@
-// pool.js — Add Liquidity integration for ARCLIQ DEX V3
+// pool.js - Add Liquidity integration (final)
 const ARLIQ = "0x3Be143cf70ACb16C7208673F1D3D2Ae403ebaEB3";
 const USDC  = "0x3600000000000000000000000000000000000000";
 const DEX   = "0xbA90A1Fa5D6Afa62789100678684F324Afc7F307";
@@ -41,8 +41,9 @@ document.getElementById("addBtn").onclick = async () => {
     const B = document.getElementById("liqUSDC").value;
     if(!A || !B) return log("Fill both amounts");
 
-    const decA = await arliqContract.decimals();
-    const decB = await usdcContract.decimals();
+    const decA = await arliqContract.decimals().catch(()=>18);
+    const decB = await usdcContract.decimals().catch(()=>6);
+
     const amtA = ethers.utils.parseUnits(A, decA);
     const amtB = ethers.utils.parseUnits(B, decB);
 
@@ -54,16 +55,20 @@ document.getElementById("addBtn").onclick = async () => {
     if(amtB.gt(balB)) return log("ERROR: USDC exceeds balance");
 
     log("Approving ARLIQ...");
-    await (await arliqContract.approve(DEX, amtA)).wait();
+    const tx1 = await arliqContract.approve(DEX, amtA);
+    await tx1.wait();
     log("Approving USDC...");
-    await (await usdcContract.approve(DEX, amtB)).wait();
+    const tx2 = await usdcContract.approve(DEX, amtB);
+    await tx2.wait();
 
     log("Adding liquidity...");
     const tx = await dexContract.addLiquidity(amtA, amtB);
     log("Tx: " + tx.hash);
     await tx.wait();
     log("Liquidity SUCCESS!");
+    // refresh balances on success
+    try { await (async ()=>{ const bA2 = await arliqContract.balanceOf(addr); const bB2 = await usdcContract.balanceOf(addr); document.getElementById("arliqBalance").innerText = ethers.utils.formatUnits(bA2, decA); document.getElementById("usdcBalance").innerText = ethers.utils.formatUnits(bB2, decB);} )(); } catch(e){}
   } catch(e){
-    log("ERR addLiquidity: " + (e.message||e));
+    log("ERR addLiquidity: " + (e.message || e));
   }
 };
