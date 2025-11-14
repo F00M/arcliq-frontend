@@ -19,7 +19,7 @@ const abiDEX = [
     "function swapUSDCtoARLIQ(uint amountIn)"
 ];
 
-/* ⭐ Fungsi LOG premium */
+/* ⭐ LOG fungsi */
 function log(msg) {
     const box = document.getElementById("logBox");
     const time = new Date().toLocaleTimeString();
@@ -27,11 +27,10 @@ function log(msg) {
     box.scrollTop = box.scrollHeight;
 }
 
-/* ⭐ Connect Wallet */
 document.getElementById("connectButton").onclick = async () => {
     try {
         await window.ethereum.request({ method: 'eth_requestAccounts' });
-        
+
         provider = new ethers.providers.Web3Provider(window.ethereum);
         signer = provider.getSigner();
 
@@ -41,6 +40,7 @@ document.getElementById("connectButton").onclick = async () => {
 
         log("Wallet connected");
         loadBalances();
+
     } catch (err) {
         log("ERROR connect wallet: " + err.message);
     }
@@ -56,6 +56,7 @@ async function loadBalances() {
         document.getElementById("usdcBalance").innerText = ethers.utils.formatUnits(b2, 18);
 
         log("Balances updated");
+
     } catch (err) {
         log("ERROR load balance: " + err.message);
     }
@@ -66,10 +67,10 @@ async function addLiquidity() {
         const amountA = document.getElementById("liqARLIQ").value;
         const amountB = document.getElementById("liqUSDC").value;
 
-        log("Approve ARLIQ...");
+        log("Approving ARLIQ...");
         await arliqContract.approve(DEX, ethers.utils.parseUnits(amountA, 18));
 
-        log("Approve USDC...");
+        log("Approving USDC...");
         await usdcContract.approve(DEX, ethers.utils.parseUnits(amountB, 18));
 
         log("Adding liquidity...");
@@ -78,8 +79,8 @@ async function addLiquidity() {
             ethers.utils.parseUnits(amountB, 18)
         );
 
-        log("Liquidity added SUCCESS!");
-        alert("Liquidity added!");
+        log("Liquidity SUCCESS!");
+
     } catch (err) {
         log("ERROR addLiquidity: " + err.message);
     }
@@ -89,14 +90,14 @@ async function swapARLIQtoUSDC() {
     try {
         const amount = document.getElementById("swapAtoB").value;
 
-        log("Approve ARLIQ for swap...");
+        log("Approve ARLIQ...");
         await arliqContract.approve(DEX, ethers.utils.parseUnits(amount, 18));
 
         log("Swap ARLIQ → USDC...");
         await dexContract.swapARLIQtoUSDC(ethers.utils.parseUnits(amount, 18));
 
         log("Swap SUCCESS!");
-        alert("Swap complete!");
+
     } catch (err) {
         log("ERROR swap A→B: " + err.message);
     }
@@ -106,14 +107,14 @@ async function swapUSDCtoARLIQ() {
     try {
         const amount = document.getElementById("swapBtoA").value;
 
-        log("Approve USDC for swap...");
+        log("Approve USDC...");
         await usdcContract.approve(DEX, ethers.utils.parseUnits(amount, 18));
 
         log("Swap USDC → ARLIQ...");
         await dexContract.swapUSDCtoARLIQ(ethers.utils.parseUnits(amount, 18));
 
         log("Swap SUCCESS!");
-        alert("Swap complete!");
+
     } catch (err) {
         log("ERROR swap B→A: " + err.message);
     }
