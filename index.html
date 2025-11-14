@@ -1,50 +1,110 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>ARCLIQ — Swap</title>
 <link rel="stylesheet" href="styles/main.css">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
-
 <body>
 
-<header class="topbar">
+<header class="navbar">
+  <div class="nav-left">
     <div class="logo">ARCLIQ</div>
-    <button id="connectButton" class="connect-btn">Connect Wallet</button>
+    <nav class="nav-links">
+      <a href="index.html" class="active">Swap</a>
+      <a href="pool.html">Pool</a>
+      <a href="#" id="docsLink">Docs</a>
+    </nav>
+  </div>
+
+  <div class="nav-right">
+    <div id="networkTag" class="network">ARC Testnet</div>
+    <button id="connectButton" class="btn connect">Connect Wallet</button>
+  </div>
 </header>
 
-<div class="container">
-    <div class="swap-card">
-        <div class="card-title">Swap</div>
-
-        <div class="token-box">
-            <div class="label">From</div>
-            <div class="row">
-                <input id="swapAtoB" class="amount-input" placeholder="0.0">
-                <div class="token-select">ARLIQ ▼</div>
-            </div>
-        </div>
-
-        <div class="arrow">↓</div>
-
-        <div class="token-box">
-            <div class="label">To</div>
-            <div class="row">
-                <input id="swapBtoA" class="amount-input" placeholder="0.0">
-                <div class="token-select">USDC ▼</div>
-            </div>
-        </div>
-
-        <button onclick="swapARLIQtoUSDC()" class="main-btn">Swap</button>
+<main class="main-wrap">
+  <section class="panel">
+    <div class="panel-header">
+      <h2>Swap</h2>
+      <div class="small">ARLIQ ↔ USDC (ARC Testnet)</div>
     </div>
 
-    <div id="logBox" class="log-box"></div>
+    <div class="card">
+      <div class="field">
+        <label>From</label>
+        <div class="input-row">
+          <input id="swapAtoB" placeholder="0.0" inputmode="decimal" />
+          <button id="fromTokenBtn" class="token-btn">ARLIQ ▾</button>
+        </div>
+        <div class="sub">Balance: <span id="arliqBalance">-</span></div>
+      </div>
+
+      <div class="swap-arrow">⇅</div>
+
+      <div class="field">
+        <label>To</label>
+        <div class="input-row">
+          <input id="swapBtoA" placeholder="0.0" inputmode="decimal" />
+          <button id="toTokenBtn" class="token-btn">USDC ▾</button>
+        </div>
+        <div class="sub">Balance: <span id="usdcBalance">-</span></div>
+      </div>
+
+      <div class="settings-row">
+        <div class="left">
+          <button id="slippageBtn" class="small-btn">Slippage: <span id="slipVal">0.5%</span> ▾</button>
+        </div>
+        <div class="right">
+          <div id="priceImpact" class="tiny">Price impact: <span id="piVal">—</span></div>
+        </div>
+      </div>
+
+      <button id="swapBtn" class="btn primary">Swap</button>
+
+      <div class="info-box" id="minReceive">Minimum received: —</div>
+    </div>
+
+    <div class="logs" id="logBox"></div>
+  </section>
+</main>
+
+<!-- TOKEN SELECTOR MODAL -->
+<div id="modalBackdrop" class="modal-backdrop hidden">
+  <div class="modal">
+    <div class="modal-header">
+      <div>Choose a token</div>
+      <button id="closeModal" class="small-btn">✕</button>
+    </div>
+    <input id="tokenSearch" class="modal-search" placeholder="Search name or address" />
+    <div id="tokenList" class="token-list">
+      <!-- token rows injected by JS -->
+    </div>
+  </div>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.min.js"></script>
-<script src="app.js"></script>
+<!-- SLIPPAGE MODAL -->
+<div id="slipBackdrop" class="modal-backdrop hidden">
+  <div class="modal small">
+    <div class="modal-header">
+      <div>Slippage Tolerance</div>
+      <button id="closeSlip" class="small-btn">✕</button>
+    </div>
+    <div class="slip-options">
+      <button class="slip-option" data-val="0.1">0.1%</button>
+      <button class="slip-option" data-val="0.5">0.5%</button>
+      <button class="slip-option" data-val="1">1%</button>
+      <div class="custom">
+        <input id="slipCustom" placeholder="custom %" inputmode="decimal" />
+        <button id="saveSlip" class="small-btn">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+<script src="app.js"></script>
 </body>
 </html>
