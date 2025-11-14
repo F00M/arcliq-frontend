@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>ARCLIQ — Pool</title>
+<link rel="stylesheet" href="styles/main.css">
+</head>
+
+<body>
+
+<header class="topbar">
+    <div class="logo">ARCLIQ — Pool</div>
+    <button id="connectButton" class="connect-btn">Connect Wallet</button>
+</header>
+
+<div class="container">
+    <div class="swap-card">
+        <div class="card-title">Add Liquidity</div>
+
+        <div class="token-box">
+            <div class="label">ARLIQ Amount</div>
+            <input id="liqARLIQ" class="amount-input" placeholder="0.0">
+        </div>
+
+        <div class="token-box">
+            <div class="label">USDC Amount</div>
+            <input id="liqUSDC" class="amount-input" placeholder="0.0">
+        </div>
+
+        <button onclick="addLiquidity()" class="main-btn">Add Liquidity</button>
+    </div>
+
+    <div id="logBox" class="log-box"></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.min.js"></script>
+<script src="pool.js"></script>
+
+</body>
+</html>
