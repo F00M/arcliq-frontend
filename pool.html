@@ -1,40 +1,53 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta charset="UTF-8">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>ARCLIQ — Pool</title>
 <link rel="stylesheet" href="styles/main.css">
 </head>
-
 <body>
 
-<header class="topbar">
-    <div class="logo">ARCLIQ — Pool</div>
-    <button id="connectButton" class="connect-btn">Connect Wallet</button>
+<header class="navbar">
+  <div class="nav-left">
+    <div class="logo">ARCLIQ</div>
+    <nav class="nav-links">
+      <a href="index.html">Swap</a>
+      <a href="pool.html" class="active">Pool</a>
+    </nav>
+  </div>
+  <div class="nav-right">
+    <div class="network">ARC Testnet</div>
+    <button id="connectButton" class="btn connect">Connect Wallet</button>
+  </div>
 </header>
 
-<div class="container">
-    <div class="swap-card">
-        <div class="card-title">Add Liquidity</div>
-
-        <div class="token-box">
-            <div class="label">ARLIQ Amount</div>
-            <input id="liqARLIQ" class="amount-input" placeholder="0.0">
-        </div>
-
-        <div class="token-box">
-            <div class="label">USDC Amount</div>
-            <input id="liqUSDC" class="amount-input" placeholder="0.0">
-        </div>
-
-        <button onclick="addLiquidity()" class="main-btn">Add Liquidity</button>
+<main class="main-wrap">
+  <section class="panel">
+    <div class="panel-header">
+      <h2>Pool — Add Liquidity</h2>
+      <div class="small">Provide ARLIQ & USDC to create a pool</div>
     </div>
 
-    <div id="logBox" class="log-box"></div>
-</div>
+    <div class="card">
+      <div class="field">
+        <label>ARLIQ Amount</label>
+        <input id="liqARLIQ" class="amount-input" placeholder="0.0" inputmode="decimal" />
+      </div>
+      <div class="field">
+        <label>USDC Amount</label>
+        <input id="liqUSDC" class="amount-input" placeholder="0.0" inputmode="decimal" />
+      </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.min.js"></script>
+      <button id="addBtn" class="btn primary">Add Liquidity</button>
+      <div class="info-box" id="poolInfo">Tip: start with small amounts for testing.</div>
+    </div>
+
+    <div id="logBox" class="logs"></div>
+  </section>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
 <script src="pool.js"></script>
-
 </body>
 </html>
