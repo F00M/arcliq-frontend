@@ -1,11 +1,14 @@
-// ARCLIQ PRO app.js (V3 compatible + UI features)
+// app.js - ARCLIQ PRO (final)
+// Addresses (change if needed)
 const ARLIQ = "0x3Be143cf70ACb16C7208673F1D3D2Ae403ebaEB3";
 const USDC  = "0x3600000000000000000000000000000000000000"; // native USDC (6)
 const DEX   = "0xbA90A1Fa5D6Afa62789100678684F324Afc7F307"; // DEX V3 decimal-aware
 
+// Ethers objects
 let provider, signer;
 let dexContract, arliqContract, usdcContract;
 
+// ABIs (minimal)
 const abiERC20 = [
   "function balanceOf(address) view returns (uint)",
   "function approve(address spender, uint amount) returns (bool)",
@@ -37,7 +40,7 @@ const slipValEl = document.getElementById("slipVal");
 const priceImpactEl = document.getElementById("piVal");
 const minReceiveEl = document.getElementById("minReceive");
 
-// default state
+// default token state
 let tokenA = {address: ARLIQ, symbol: "ARLIQ", decimals: 18};
 let tokenB = {address: USDC, symbol: "USDC", decimals: 6};
 let selecting = null; // "from" or "to"
@@ -45,20 +48,20 @@ let slippage = localStorage.getItem("arcliq_slip") || "0.5"; // percent
 
 slipValEl.innerText = slippage + "%";
 
-// small token list (can be extended)
+// token list (extendable)
 const TOKENS = [
   {address: ARLIQ, symbol: "ARLIQ", decimals: 18},
-  {address: USDC, symbol: "USDC", decimals: 6},
+  {address: USDC, symbol: "USDC", decimals: 6}
 ];
 
-// logging helper
+// logging
 function log(msg){
   const t = new Date().toLocaleTimeString();
   logBox.innerHTML += `[${t}] ${msg}<br>`;
   logBox.scrollTop = logBox.scrollHeight;
 }
 
-// connect
+// connect wallet
 connectBtn.onclick = async () => {
   try {
     await window.ethereum.request({ method: "eth_requestAccounts" });
@@ -72,15 +75,17 @@ connectBtn.onclick = async () => {
     log("Wallet connected");
     await loadBalances();
     startAutoRefresh();
-  } catch (e) { log("ERROR connect: " + (e.message||e)); }
+  } catch (e) {
+    log("ERROR connect: " + (e.message || e));
+  }
 };
 
 // load balances
 async function loadBalances(){
   try {
     const addr = await signer.getAddress();
-    const decA = await arliqContract.decimals();
-    const decB = await usdcContract.decimals();
+    const decA = await arliqContract.decimals().catch(()=>18);
+    const decB = await usdcContract.decimals().catch(()=>6);
 
     const bA = await arliqContract.balanceOf(addr);
     const bB = await usdcContract.balanceOf(addr);
@@ -88,28 +93,32 @@ async function loadBalances(){
     document.getElementById("arliqBalance").innerText = ethers.utils.formatUnits(bA, decA);
     document.getElementById("usdcBalance").innerText = ethers.utils.formatUnits(bB, decB);
     log("Balances updated");
-  } catch (e){ log("ERROR load balance: " + (e.message||e)); }
+  } catch (e){
+    log("ERROR load balance: " + (e.message || e));
+  }
 }
 
-// auto refresh
-let refreshInterval=null;
+// auto refresh balances every 5s
+let refreshInterval = null;
 function startAutoRefresh(){
   if(refreshInterval) clearInterval(refreshInterval);
-  refreshInterval = setInterval(async ()=> {
+  refreshInterval = setInterval(async ()=>{
     try { if(signer) await loadBalances(); } catch(e){}
   },5000);
 }
 
-// token selector modal
+// TOKEN SELECTOR
 function openTokenSelector(which){
   selecting = which;
   modalBackdrop.classList.remove("hidden");
   renderTokenList(TOKENS);
+  tokenSearch.value = "";
+  tokenSearch.focus();
 }
 fromTokenBtn.onclick = ()=> openTokenSelector("from");
 toTokenBtn.onclick = ()=> openTokenSelector("to");
 closeModal.onclick = ()=> modalBackdrop.classList.add("hidden");
-tokenSearch.oninput = (e)=> {
+tokenSearch.oninput = (e)=>{
   const q = e.target.value.toLowerCase();
   const filtered = TOKENS.filter(t => t.symbol.toLowerCase().includes(q) || t.address.toLowerCase().includes(q));
   renderTokenList(filtered);
@@ -120,20 +129,19 @@ function renderTokenList(list){
   list.forEach(t=>{
     const row = document.createElement("div");
     row.className = "token-row";
-    row.innerHTML = `<div class="token-name"><div class="token-icon"></div><div>${t.symbol}</div></div><div>${t.address.slice(0,6)}...</div>`;
-    row.onclick = ()=> {
+    row.innerHTML = `<div class="token-name"><div class="token-icon"></div><div>${t.symbol}</div></div><div style="font-size:13px;color:var(--muted)">${t.address.slice(0,6)}...</div>`;
+    row.onclick = ()=>{
       if(selecting === "from"){ tokenA = t; fromTokenBtn.innerText = t.symbol + " ▾"; }
       else { tokenB = t; toTokenBtn.innerText = t.symbol + " ▾"; }
       modalBackdrop.classList.add("hidden");
       log(`Selected ${t.symbol} for ${selecting}`);
-      // if connected, refresh balances
       if(signer) loadBalances();
     };
     tokenListEl.appendChild(row);
   });
 }
 
-// slippage modal
+// SLIPPAGE
 slipBtn.onclick = ()=> slipBackdrop.classList.remove("hidden");
 document.getElementById("closeSlip").onclick = ()=> slipBackdrop.classList.add("hidden");
 slipOptions.forEach(b=>{
@@ -144,22 +152,21 @@ slipOptions.forEach(b=>{
     slipBackdrop.classList.add("hidden");
   };
 });
-document.getElementById("saveSlip").onclick = ()=> {
+document.getElementById("saveSlip").onclick = ()=>{
   const v = document.getElementById("slipCustom").value;
   if(v && !isNaN(v)){ slippage = v; slipValEl.innerText = slippage + "%"; localStorage.setItem("arcliq_slip", slippage); slipBackdrop.classList.add("hidden"); }
 };
 
-// very simple price impact calc (placeholder since DEX is 1:1 simple)
+// simple estimate (placeholder)
 function computeEstimate(amountStr){
   if(!amountStr || isNaN(Number(amountStr))) return {minReceive:"—", impact:"0%"};
   const amount = Number(amountStr);
-  // dummy: price impact 0.3% for >1000, else low
   const impact = amount > 1000 ? "0.3%" : "0.01%";
   const minRecv = (amount * (1 - parseFloat(slippage)/100)).toFixed(6);
   return {minReceive: minRecv, impact};
 }
 
-// swap action
+// Swap ARLIQ -> USDC (uses DEX V3 function swapARLIQtoUSDC)
 async function swapARLIQtoUSDC(){
   try {
     if(!signer) return log("Connect wallet first");
@@ -168,34 +175,32 @@ async function swapARLIQtoUSDC(){
     const decA = await arliqContract.decimals();
     const amt = ethers.utils.parseUnits(amount, decA);
 
-    // balance check
     const addr = await signer.getAddress();
     const bal = await arliqContract.balanceOf(addr);
     if(amt.gt(bal)) return log("ERROR: ARLIQ exceeds balance");
 
-    // approve then swap
     log("Approving ARLIQ...");
-    await (await arliqContract.approve(DEX, amt)).wait();
+    const apptx = await arliqContract.approve(DEX, amt);
+    await apptx.wait();
 
     log("Swapping ARLIQ → USDC...");
     const tx = await dexContract.swapARLIQtoUSDC(amt);
     log("Tx sent: " + tx.hash);
     await tx.wait();
     log("Swap SUCCESS!");
+
     const est = computeEstimate(amount);
     minReceiveEl.innerText = "Minimum received: " + est.minReceive + " " + tokenB.symbol;
     priceImpactEl.innerText = est.impact;
     await loadBalances();
   } catch (e){
-    log("ERROR swap: " + (e.message||e));
+    log("ERROR swap: " + (e.message || e));
   }
 }
 
 // wire swap button
-document.getElementById("swapBtn").onclick = swapARLIQtoUSDC;
+swapBtn.onclick = swapARLIQtoUSDC;
 
-// helper: init default token list render
+// init token list UI
 renderTokenList(TOKENS);
-
-// show initial saved slippage
 slipValEl.innerText = slippage + "%";
