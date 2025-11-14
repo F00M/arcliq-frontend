@@ -19,57 +19,102 @@ const abiDEX = [
     "function swapUSDCtoARLIQ(uint amountIn)"
 ];
 
+/* ⭐ Fungsi LOG premium */
+function log(msg) {
+    const box = document.getElementById("logBox");
+    const time = new Date().toLocaleTimeString();
+    box.innerHTML += `[${time}] ${msg}<br>`;
+    box.scrollTop = box.scrollHeight;
+}
+
+/* ⭐ Connect Wallet */
 document.getElementById("connectButton").onclick = async () => {
-    await window.ethereum.request({ method: 'eth_requestAccounts' });
+    try {
+        await window.ethereum.request({ method: 'eth_requestAccounts' });
+        
+        provider = new ethers.providers.Web3Provider(window.ethereum);
+        signer = provider.getSigner();
 
-    provider = new ethers.providers.Web3Provider(window.ethereum);
-    signer = provider.getSigner();
+        dexContract = new ethers.Contract(DEX, abiDEX, signer);
+        arliqContract = new ethers.Contract(ARLIQ, abiERC20, signer);
+        usdcContract = new ethers.Contract(USDC, abiERC20, signer);
 
-    dexContract = new ethers.Contract(DEX, abiDEX, signer);
-    arliqContract = new ethers.Contract(ARLIQ, abiERC20, signer);
-    usdcContract = new ethers.Contract(USDC, abiERC20, signer);
-
-    loadBalances();
+        log("Wallet connected");
+        loadBalances();
+    } catch (err) {
+        log("ERROR connect wallet: " + err.message);
+    }
 };
 
 async function loadBalances() {
-    const address = await signer.getAddress();
-    const b1 = await arliqContract.balanceOf(address);
-    const b2 = await usdcContract.balanceOf(address);
+    try {
+        const address = await signer.getAddress();
+        const b1 = await arliqContract.balanceOf(address);
+        const b2 = await usdcContract.balanceOf(address);
 
-    document.getElementById("arliqBalance").innerText = ethers.utils.formatUnits(b1, 18);
-    document.getElementById("usdcBalance").innerText = ethers.utils.formatUnits(b2, 18);
+        document.getElementById("arliqBalance").innerText = ethers.utils.formatUnits(b1, 18);
+        document.getElementById("usdcBalance").innerText = ethers.utils.formatUnits(b2, 18);
+
+        log("Balances updated");
+    } catch (err) {
+        log("ERROR load balance: " + err.message);
+    }
 }
 
 async function addLiquidity() {
-    const amountA = document.getElementById("liqARLIQ").value;
-    const amountB = document.getElementById("liqUSDC").value;
+    try {
+        const amountA = document.getElementById("liqARLIQ").value;
+        const amountB = document.getElementById("liqUSDC").value;
 
-    await arliqContract.approve(DEX, ethers.utils.parseUnits(amountA, 18));
-    await usdcContract.approve(DEX, ethers.utils.parseUnits(amountB, 18));
+        log("Approve ARLIQ...");
+        await arliqContract.approve(DEX, ethers.utils.parseUnits(amountA, 18));
 
-    await dexContract.addLiquidity(
-        ethers.utils.parseUnits(amountA, 18),
-        ethers.utils.parseUnits(amountB, 18)
-    );
+        log("Approve USDC...");
+        await usdcContract.approve(DEX, ethers.utils.parseUnits(amountB, 18));
 
-    alert("Liquidity added!");
+        log("Adding liquidity...");
+        await dexContract.addLiquidity(
+            ethers.utils.parseUnits(amountA, 18),
+            ethers.utils.parseUnits(amountB, 18)
+        );
+
+        log("Liquidity added SUCCESS!");
+        alert("Liquidity added!");
+    } catch (err) {
+        log("ERROR addLiquidity: " + err.message);
+    }
 }
 
 async function swapARLIQtoUSDC() {
-    const amount = document.getElementById("swapAtoB").value;
+    try {
+        const amount = document.getElementById("swapAtoB").value;
 
-    await arliqContract.approve(DEX, ethers.utils.parseUnits(amount, 18));
-    await dexContract.swapARLIQtoUSDC(ethers.utils.parseUnits(amount, 18));
+        log("Approve ARLIQ for swap...");
+        await arliqContract.approve(DEX, ethers.utils.parseUnits(amount, 18));
 
-    alert("Swap complete!");
+        log("Swap ARLIQ → USDC...");
+        await dexContract.swapARLIQtoUSDC(ethers.utils.parseUnits(amount, 18));
+
+        log("Swap SUCCESS!");
+        alert("Swap complete!");
+    } catch (err) {
+        log("ERROR swap A→B: " + err.message);
+    }
 }
 
 async function swapUSDCtoARLIQ() {
-    const amount = document.getElementById("swapBtoA").value;
+    try {
+        const amount = document.getElementById("swapBtoA").value;
 
-    await usdcContract.approve(DEX, ethers.utils.parseUnits(amount, 18));
-    await dexContract.swapUSDCtoARLIQ(ethers.utils.parseUnits(amount, 18));
+        log("Approve USDC for swap...");
+        await usdcContract.approve(DEX, ethers.utils.parseUnits(amount, 18));
 
-    alert("Swap complete!");
+        log("Swap USDC → ARLIQ...");
+        await dexContract.swapUSDCtoARLIQ(ethers.utils.parseUnits(amount, 18));
+
+        log("Swap SUCCESS!");
+        alert("Swap complete!");
+    } catch (err) {
+        log("ERROR swap B→A: " + err.message);
+    }
 }
