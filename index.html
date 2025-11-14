@@ -1,50 +1,50 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>ARCLIQ Swap</title>
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ARCLIQ — Swap</title>
+<link rel="stylesheet" href="styles/main.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
+
 <body>
 
-    <div class="container">
+<header class="topbar">
+    <div class="logo">ARCLIQ</div>
+    <button id="connectButton" class="connect-btn">Connect Wallet</button>
+</header>
 
-        <h1>ARCLIQ Exchange</h1>
-        <p>ARLIQ ↔ USDC on ARC Testnet</p>
+<div class="container">
+    <div class="swap-card">
+        <div class="card-title">Swap</div>
 
-        <button id="connectButton">Connect Wallet</button>
-
-        <div class="box">
-            <h3>Balances</h3>
-            <p>ARLIQ: <span id="arliqBalance">0</span></p>
-            <p>USDC: <span id="usdcBalance">0</span></p>
+        <div class="token-box">
+            <div class="label">From</div>
+            <div class="row">
+                <input id="swapAtoB" class="amount-input" placeholder="0.0">
+                <div class="token-select">ARLIQ ▼</div>
+            </div>
         </div>
 
-        <div class="box">
-            <h3>Swap ARLIQ → USDC</h3>
-            <input id="swapAtoB" placeholder="Amount ARLIQ">
-            <button onclick="swapARLIQtoUSDC()">Swap</button>
+        <div class="arrow">↓</div>
+
+        <div class="token-box">
+            <div class="label">To</div>
+            <div class="row">
+                <input id="swapBtoA" class="amount-input" placeholder="0.0">
+                <div class="token-select">USDC ▼</div>
+            </div>
         </div>
 
-        <div class="box">
-            <h3>Swap USDC → ARLIQ</h3>
-            <input id="swapBtoA" placeholder="Amount USDC">
-            <button onclick="swapUSDCtoARLIQ()">Swap</button>
-        </div>
-
-        <div class="box">
-            <h3>Add Liquidity</h3>
-            <input id="liqARLIQ" placeholder="Amount ARLIQ">
-            <input id="liqUSDC" placeholder="Amount USDC">
-            <button onclick="addLiquidity()">Add Liquidity</button>
-        </div>
-
-        <h3 style="margin-top:20px;">Logs</h3>
-        <div id="logBox"></div>
-
+        <button onclick="swapARLIQtoUSDC()" class="main-btn">Swap</button>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
-    <script src="app.js"></script>
+    <div id="logBox" class="log-box"></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.min.js"></script>
+<script src="app.js"></script>
 
 </body>
 </html>
