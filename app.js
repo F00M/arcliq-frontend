@@ -19,7 +19,6 @@ const abiDEX = [
     "function swapUSDCtoARLIQ(uint amountIn)"
 ];
 
-/* ⭐ LOG fungsi */
 function log(msg) {
     const box = document.getElementById("logBox");
     const time = new Date().toLocaleTimeString();
@@ -53,7 +52,7 @@ async function loadBalances() {
         const b2 = await usdcContract.balanceOf(address);
 
         document.getElementById("arliqBalance").innerText = ethers.utils.formatUnits(b1, 18);
-        document.getElementById("usdcBalance").innerText = ethers.utils.formatUnits(b2, 18);
+        document.getElementById("usdcBalance").innerText = ethers.utils.formatUnits(b2, 6);
 
         log("Balances updated");
 
@@ -71,12 +70,12 @@ async function addLiquidity() {
         await arliqContract.approve(DEX, ethers.utils.parseUnits(amountA, 18));
 
         log("Approving USDC...");
-        await usdcContract.approve(DEX, ethers.utils.parseUnits(amountB, 18));
+        await usdcContract.approve(DEX, ethers.utils.parseUnits(amountB, 6));
 
         log("Adding liquidity...");
         await dexContract.addLiquidity(
             ethers.utils.parseUnits(amountA, 18),
-            ethers.utils.parseUnits(amountB, 18)
+            ethers.utils.parseUnits(amountB, 6)
         );
 
         log("Liquidity SUCCESS!");
@@ -108,10 +107,10 @@ async function swapUSDCtoARLIQ() {
         const amount = document.getElementById("swapBtoA").value;
 
         log("Approve USDC...");
-        await usdcContract.approve(DEX, ethers.utils.parseUnits(amount, 18));
+        await usdcContract.approve(DEX, ethers.utils.parseUnits(amount, 6));
 
         log("Swap USDC → ARLIQ...");
-        await dexContract.swapUSDCtoARLIQ(ethers.utils.parseUnits(amount, 18));
+        await dexContract.swapUSDCtoARLIQ(ethers.utils.parseUnits(amount, 6));
 
         log("Swap SUCCESS!");
 
