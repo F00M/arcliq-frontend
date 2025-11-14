@@ -19,6 +19,7 @@ const abiDEX = [
     "function swapUSDCtoARLIQ(uint amountIn)"
 ];
 
+/* ⭐ LOG PANEL */
 function log(msg) {
     const box = document.getElementById("logBox");
     const time = new Date().toLocaleTimeString();
@@ -26,6 +27,7 @@ function log(msg) {
     box.scrollTop = box.scrollHeight;
 }
 
+/* ⭐ CONNECT WALLET */
 document.getElementById("connectButton").onclick = async () => {
     try {
         await window.ethereum.request({ method: 'eth_requestAccounts' });
@@ -45,6 +47,7 @@ document.getElementById("connectButton").onclick = async () => {
     }
 };
 
+/* ⭐ BALANCE UPDATE */
 async function loadBalances() {
     try {
         const address = await signer.getAddress();
@@ -52,7 +55,7 @@ async function loadBalances() {
         const b2 = await usdcContract.balanceOf(address);
 
         document.getElementById("arliqBalance").innerText = ethers.utils.formatUnits(b1, 18);
-        document.getElementById("usdcBalance").innerText = ethers.utils.formatUnits(b2, 6);
+        document.getElementById("usdcBalance").innerText = ethers.utils.formatUnits(b2, 6); // FIX 6 decimals
 
         log("Balances updated");
 
@@ -61,22 +64,38 @@ async function loadBalances() {
     }
 }
 
+/* ⭐ ADD LIQUIDITY (FULL FIXED) */
 async function addLiquidity() {
     try {
         const amountA = document.getElementById("liqARLIQ").value;
         const amountB = document.getElementById("liqUSDC").value;
 
+        const address = await signer.getAddress();
+        const balARLIQ = await arliqContract.balanceOf(address);
+        const balUSDC = await usdcContract.balanceOf(address);
+
+        const neededA = ethers.utils.parseUnits(amountA, 18);
+        const neededB = ethers.utils.parseUnits(amountB, 6);
+
+        // VALIDASI SALDO
+        if (neededA.gt(balARLIQ)) {
+            log("ERROR: ARLIQ exceeds balance");
+            return;
+        }
+
+        if (neededB.gt(balUSDC)) {
+            log("ERROR: USDC exceeds balance");
+            return;
+        }
+
         log("Approving ARLIQ...");
-        await arliqContract.approve(DEX, ethers.utils.parseUnits(amountA, 18));
+        await arliqContract.approve(DEX, neededA);
 
         log("Approving USDC...");
-        await usdcContract.approve(DEX, ethers.utils.parseUnits(amountB, 6));
+        await usdcContract.approve(DEX, neededB);
 
         log("Adding liquidity...");
-        await dexContract.addLiquidity(
-            ethers.utils.parseUnits(amountA, 18),
-            ethers.utils.parseUnits(amountB, 6)
-        );
+        await dexContract.addLiquidity(neededA, neededB);
 
         log("Liquidity SUCCESS!");
 
@@ -85,15 +104,26 @@ async function addLiquidity() {
     }
 }
 
+/* ⭐ SWAP ARLIQ → USDC (FIXED) */
 async function swapARLIQtoUSDC() {
     try {
         const amount = document.getElementById("swapAtoB").value;
 
-        log("Approve ARLIQ...");
-        await arliqContract.approve(DEX, ethers.utils.parseUnits(amount, 18));
+        const address = await signer.getAddress();
+        const balA = await arliqContract.balanceOf(address);
 
-        log("Swap ARLIQ → USDC...");
-        await dexContract.swapARLIQtoUSDC(ethers.utils.parseUnits(amount, 18));
+        const needed = ethers.utils.parseUnits(amount, 18);
+
+        if (needed.gt(balA)) {
+            log("ERROR: ARLIQ exceeds balance");
+            return;
+        }
+
+        log("Approving ARLIQ...");
+        await arliqContract.approve(DEX, needed);
+
+        log("Swapping ARLIQ → USDC...");
+        await dexContract.swapARLIQtoUSDC(needed);
 
         log("Swap SUCCESS!");
 
@@ -102,15 +132,26 @@ async function swapARLIQtoUSDC() {
     }
 }
 
+/* ⭐ SWAP USDC → ARLIQ (FIXED) */
 async function swapUSDCtoARLIQ() {
     try {
         const amount = document.getElementById("swapBtoA").value;
 
-        log("Approve USDC...");
-        await usdcContract.approve(DEX, ethers.utils.parseUnits(amount, 6));
+        const address = await signer.getAddress();
+        const balUSDC = await usdcContract.balanceOf(address);
 
-        log("Swap USDC → ARLIQ...");
-        await dexContract.swapUSDCtoARLIQ(ethers.utils.parseUnits(amount, 6));
+        const needed = ethers.utils.parseUnits(amount, 6);
+
+        if (needed.gt(balUSDC)) {
+            log("ERROR: USDC exceeds balance");
+            return;
+        }
+
+        log("Approving USDC...");
+        await usdcContract.approve(DEX, needed);
+
+        log("Swapping USDC → ARLIQ...");
+        await dexContract.swapUSDCtoARLIQ(needed);
 
         log("Swap SUCCESS!");
 
